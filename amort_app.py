@@ -1,10 +1,11 @@
 #import Libraries
 import pandas as pd
 import datetime as dt
-from datetime import date, timedelta
+from datetime import date, timedelta,datetime
 from pandas.tseries.offsets import MonthEnd
 from dateutil.relativedelta import relativedelta
 import streamlit as st
+import numpy as np
 from amort_func import *
 
 
@@ -33,6 +34,9 @@ if 'master_df' not in st.session_state:
 
 if 'amort_rollforward' not in st.session_state:
     st.session_state['amort_rollforward']=pd.DataFrame(columns=['schedule_month','sales_month','source','material#','sales_amt','amrt_start_month','amrt_period','amrt_factor','beg_bal','remainder','end_bal','monthly_amort'])
+
+if 'summary' not in st.session_state:
+    st.session_state['summary']=pd.DataFrame(columns=['schedule_month','material#','monthly_amort'])
 
 
 st.title('Amortization Schedule Application')
@@ -82,5 +86,25 @@ st.download_button(
      label="Download master schedule as CSV",
      data=csv,
      file_name='master_schedule.csv',
+     mime='text/csv',
+ )
+
+st.subheader('4. Amortization Summary')
+
+
+if st.button('Generate Summary'):
+    summary=st.session_state.master_df.groupby(by=['schedule_month','material#']).sum()
+    summary=summary.iloc[:,[-1]]
+    summary=summary.reset_index()
+
+    st.write(summary)
+
+
+csv2 = convert_df(st.session_state.summary)
+
+st.download_button(
+     label="Download amort summary schedule as CSV",
+     data=csv,
+     file_name='amort_summary.csv',
      mime='text/csv',
  )

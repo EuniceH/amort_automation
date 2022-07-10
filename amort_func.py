@@ -1,17 +1,24 @@
 #import Libraries
 import pandas as pd
 import datetime as dt
-from datetime import date, timedelta
+from datetime import date, timedelta,datetime
 from pandas.tseries.offsets import MonthEnd
 from dateutil.relativedelta import relativedelta
+import numpy as np
 
 
 #EH:  set import sales function for amortization
 def import_data(file_path):
     #import data from path
     import_sales=pd.read_csv(file_path)
+
+ 
     #update column data to datetime
-    import_sales.loc[:,['schedule_month','sales_month','amrt_start_month']]=import_sales.loc[:,['schedule_month','sales_month','amrt_start_month']].astype('datetime64[ns]')
+    import_sales.loc[:,['schedule_month','sales_month','amrt_start_month']]=import_sales.loc[:,['schedule_month','sales_month','amrt_start_month']].astype('datetime64')
+
+
+
+    # import_sales['schedule_month']= import_sales['schedule_month'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
     #get last date of month
     import_sales['schedule_month']=import_sales['schedule_month']+MonthEnd(0)
     
@@ -81,3 +88,5 @@ def master_schedule(df1,df2):
 
     master_schedule=pd.concat([df1,df2],axis=0,ignore_index=True)
     return master_schedule
+
+
