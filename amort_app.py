@@ -54,20 +54,23 @@ if uploaded_file is not None:
      #EH: display sales file as df
      st.write(import_df)
 
+    #EH: specify the last month of amortization per schedule month
      st.write(f'max_amort_date is {max_date} for this schedule')
 
 
 
 
-
+#EH:  calculate amortization rollforward of sales per schedule month
 st.subheader('2. calculate amortization rollfoward')
+
+
 if st.button('calculate rollforward'):
     #EH: calculate amort
     st.session_state.amort_rollforward=rollforward_df(import_df,max_date)
     #EH: display amortization schedule
     st.write(st.session_state.amort_rollforward)
 
-
+#EH:  compile amortization rollforward to master amortization schedul
 st.subheader('3. add rollfoward to master schedule')
 if st.button('compile master schedule'):
     #EH: create master df
@@ -82,6 +85,7 @@ def convert_df(df):
 
 csv = convert_df(st.session_state.master_df)
 
+#EH: download amortization master schedult o csv
 st.download_button(
      label="Download master schedule as CSV",
      data=csv,
@@ -89,6 +93,7 @@ st.download_button(
      mime='text/csv',
  )
 
+#EH:  summarize amortization by schedule month and material number
 st.subheader('4. Amortization Summary')
 
 
@@ -102,9 +107,26 @@ if st.button('Generate Summary'):
 
 csv2 = convert_df(st.session_state.summary)
 
+#EH: download amortization summary o csv
 st.download_button(
      label="Download amort summary schedule as CSV",
-     data=csv,
+     data=csv2,
      file_name='amort_summary.csv',
      mime='text/csv',
  )
+
+#EH: pivot the master schedule to column rollforward
+st.subheader('5. Pivot schedule')
+
+if st.button('Generate schedule pivot'):
+
+
+    pivot_df=st.session_state.master_df.copy()
+    pivot_df=pd.pivot_table(pivot_df,columns=['schedule_month'],values=['beg_bal','remainder','end_bal','monthly_amort'],index=['sales_month','source','material#','sales_amt','amrt_start_month','amrt_period','amrt_factor'],fill_value=0).swaplevel(0,1, axis=1).sort_index(axis=1)
+    pivot_df=pivot_df.reset_index()
+
+    st.write(pivot_df)
+
+
+
+
