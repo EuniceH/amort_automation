@@ -98,11 +98,11 @@ st.subheader('4. Amortization Summary')
 
 
 if st.button('Generate Summary'):
-    summary=st.session_state.master_df.groupby(by=['schedule_month','material#']).sum()
-    summary=summary.iloc[:,[-1]]
-    summary=summary.reset_index()
+    st.session_state.summary=st.session_state.master_df.groupby(by=['schedule_month','material#']).sum()
+    st.session_state.summary=st.session_state.summary.iloc[:,[-1]]
+    st.session_state.summary=st.session_state.summary.reset_index()
 
-    st.write(summary)
+    st.write(st.session_state.summary)
 
 
 csv2 = convert_df(st.session_state.summary)
